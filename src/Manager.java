@@ -13,7 +13,13 @@ public class Manager {
 	
 	public void create_process(String PID, int priority)
 	{
+		// create new PCB
+		PCB pcb = new PCB(PID, priority);
 		
+		// add to the ready list
+		readyList[priority].insert(pcb);
+		
+		scheduler();
 	}
 	
 	public void destroy_process(String PID)
@@ -38,6 +44,10 @@ public class Manager {
 	
 	public void scheduler()
 	{
+		
+	}
+	
+	public void Kill_Tree(PCB p) {
 		
 	}
 
