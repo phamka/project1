@@ -37,7 +37,11 @@ import java.util.Scanner;
 
 public class PresentationShell
 {
-    PresentationShell() {}
+	private static Manager manager;
+	
+    PresentationShell() {
+    	manager = new Manager();
+    }
 
     public enum Command
     {
@@ -52,8 +56,9 @@ public class PresentationShell
 
     public static void main(String[] args)
     {
-       read_file("");
-       create_shell();
+    	
+    	read_file("");
+    	create_shell();
        
     }
     
@@ -66,7 +71,61 @@ public class PresentationShell
     // creating shell for process command manually
     public static void create_shell()
     {
-    	
+    	Scanner consoleIn = new Scanner(System.in);
+        Command opcode;
+
+
+        do {
+            System.out.print("shell> ");
+            String cmd = consoleIn.nextLine();
+            String[] cmds = cmd.split(" ");
+            opcode = Command.valueOf(cmds[0].toUpperCase());
+
+            switch (opcode) {
+                case INIT:
+                    manager.create_process("init", 0);
+                    System.out.println("input is init");
+                    break;
+
+                case QUIT:
+                    if (cmds.length != 1)
+                    {
+                        System.out.println("\nError: 'quit' format is wrong type quit");
+                    }
+                    System.out.println("*exit system");
+                    break;
+                case CR:    // cr A 1   //create <name> <priority>
+                    System.out.println("*create process");
+
+                    if(manager != null && cmds.length == 3)
+                    {
+                        String processName = cmds[1];
+                        int priorityNum = Integer.parseInt(cmds[2]);
+                        manager.createPCB(processName, priorityNum);
+                    }
+                    else if(cmds.length != 3)
+                        System.out.println("");
+                    break;
+
+                case DE:
+                    System.out.println("*destroy process");
+                    break;
+
+                case REQ:
+                    System.out.println("*request resource");
+                    break;
+
+                case TO:
+                    System.out.println("*process time-out");
+                    break;
+
+                default:
+                    System.out.println("wrong command please enter correct input.");
+            }
+
+        }while(!(opcode == Command.QUIT));
+
+        consoleIn.close();
     }
     
     public void process_line(String line)
