@@ -31,7 +31,7 @@
         provide information about a given process
         provide information about a given resource
  */
-
+import java.io.*;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -60,7 +60,21 @@ public class PresentationShell
     // function to read in a file and execute line by line
     public static void read_file(String filename)
     {
+    	BufferedReader br = null;
     	
+    	try {
+    		String strLine;
+    		br = new BufferedReader(new FileReader(filename));
+    		
+    		// read line by line
+    		while ((strLine = br.readLine()) != null) {
+    			process_line(strLine);
+    		}
+    		
+    		br.close();
+    	} catch (Exception e) {
+    		System.err.println("ERROR: " + e.getMessage());
+    	}     	
     }
     
     // creating shell for process command manually
@@ -69,7 +83,7 @@ public class PresentationShell
     	
     }
     
-    public void process_line(String line)
+    public static void process_line(String line)
     {
     	
     }
