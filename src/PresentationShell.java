@@ -40,7 +40,7 @@ public class PresentationShell
 	private static Manager manager;
 	
     PresentationShell() {
-    	manager = new Manager();
+    	
     }
 
     public enum Command
@@ -56,8 +56,9 @@ public class PresentationShell
 
     public static void main(String[] args)
     {
+    	manager = new Manager();
     	
-    	read_file("");
+    	//read_file("");
     	create_shell();
        
     }
@@ -97,7 +98,7 @@ public class PresentationShell
 
             switch (opcode) {
                 case INIT:
-                    manager.create_process("init", 0);
+                    manager.create_init();
                     System.out.println("input is init");
                     break;
 
@@ -115,14 +116,26 @@ public class PresentationShell
                     {
                         String processName = cmds[1];
                         int priorityNum = Integer.parseInt(cmds[2]);
-                        manager.createPCB(processName, priorityNum);
+                        manager.create_process(processName, priorityNum);
                     }
                     else if(cmds.length != 3)
-                        System.out.println("");
+                        System.out.println("error format");
                     break;
 
-                case DE:
-                    System.out.println("*destroy process");
+                case DE: // de <name>
+                    
+                    
+                    if(manager != null && cmds.length == 2)
+                    {
+                    	String PID = cmds[1];
+                    	manager.destroy_process(PID);
+                    	System.out.println("*destroy process");
+                    }
+                    else if(cmds.length != 2)
+                    {
+                    	System.out.println("error format");
+                    }
+                    
                     break;
 
                 case REQ:

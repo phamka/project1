@@ -1,23 +1,27 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class ReadyList {
+	private ArrayList<PCB> list;
 	
-	private int priority;
-	private HashMap<String, PCB> list;
-	
-	public ReadyList(int priority)
+	public ReadyList()
 	{
-		this.priority = priority;
-		list = new HashMap<String, PCB>();
+		list = new ArrayList<PCB>();
 	}
 	
 	public void insert(PCB pcb) {
-		list.put(pcb.getPID(), pcb);
+		list.add(pcb);
 	}
 	
-	public void removePCB(String PID) {
-		list.remove(PID);
+	public void removePCB(PCB p) {
+		list.remove(p);
+	}
+	
+	public int getSize() {
+		return list.size();
+	}
+	
+	public PCB highestPriorityPCB() {
+		return list.get(0);
 	}
 }

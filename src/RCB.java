@@ -4,13 +4,18 @@ import java.util.ArrayList;
 public class RCB  {
 	
 	private String RID;
-	private int status;
+	private status status;
 	private ArrayList<PCB> waitingList;
+	
+	public enum status {
+		FREE, 
+		ALLOCATED
+	}
 	
 	public RCB(String RID)
 	{
-		this.RID = RID;
-		status = 0;
+		this.RID = "R" + RID;
+		this.status = status.FREE;
 		waitingList = new ArrayList<PCB>();
 	}
 	
@@ -22,12 +27,16 @@ public class RCB  {
 		waitingList.add(pcb);
 	}
 	
-	public int getStatus() {
+	public status getStatus() {
 		return status;
 	}
 	
-	public void setStatus(int status) {
-		this.status = status;
+	public void setStatus(status s) {
+		this.status = s;
+	}
+	
+	public void removePCB(PCB p) {
+		waitingList.remove(p);
 	}
 	
 	public int getWaitingListSize() {
