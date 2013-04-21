@@ -43,7 +43,7 @@ public class PCB {
 		child = childProcess;
 	}
 	
-	public void changeStatus(status statusType)
+	public void setStatus(status statusType)
 	{
 		status_type = statusType;
 	}
@@ -56,6 +56,10 @@ public class PCB {
 	public void addResource(RCB resource)
 	{
 		resource_list.add(resource);
+	}
+	
+	public void removeResource(RCB resource) {
+		resource_list.remove(resource);
 	}
 	
 	// all get methods for PCB

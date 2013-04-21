@@ -6,15 +6,24 @@ public class RCB  {
 	private String RID;
 	private status status;
 	private ArrayList<PCB> waitingList;
+	private PCB holder;
 	
 	public enum status {
 		FREE, 
 		ALLOCATED
 	}
 	
+	public void setHolder(PCB p) {
+		holder = p;
+	}
+	
+	public PCB getHolder(){
+		return holder;
+	}
+	
 	public RCB(String RID)
 	{
-		this.RID = "R" + RID;
+		this.RID = RID;
 		this.status = status.FREE;
 		waitingList = new ArrayList<PCB>();
 	}

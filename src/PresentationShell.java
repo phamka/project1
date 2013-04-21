@@ -50,8 +50,9 @@ public class PresentationShell
         CR,     //CREATE
         DE,     //DESTROY
         REQ,    //REQUEST
-        TO      //TIMEOUT
-
+        REL,
+        TO,      //TIMEOUT
+        DUMP
     }
 
     public static void main(String[] args)
@@ -99,7 +100,7 @@ public class PresentationShell
             switch (opcode) {
                 case INIT:
                     manager.create_init();
-                    System.out.println("input is init");
+                    //System.out.println("input is init");
                     break;
 
                 case QUIT:
@@ -110,7 +111,7 @@ public class PresentationShell
                     System.out.println("*exit system");
                     break;
                 case CR:    // cr A 1   //create <name> <priority>
-                    System.out.println("*create process");
+                    //System.out.println("*create process");
 
                     if(manager != null && cmds.length == 3)
                     {
@@ -140,12 +141,22 @@ public class PresentationShell
 
                 case REQ:
                     System.out.println("*request resource");
+                    String RID = cmds[1];
+                    manager.request_resource(RID);
                     break;
-
+                    
+                case REL:
+                	String RID1 = cmds[1];
+                	manager.release_resource(RID1);
                 case TO:
                     System.out.println("*process time-out");
+                    manager.time_out();
                     break;
 
+                case DUMP:
+                	manager.memory_dump();
+                	break;
+                    
                 default:
                     System.out.println("wrong command please enter correct input.");
             }

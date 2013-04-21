@@ -20,7 +20,7 @@ public class Manager {
 		resourceList = new RCB[4];
 		for(int i = 0; i < resourceList.length; i++)
 		{
-			resourceList[i] = new RCB(Integer.toString(i+1));
+			resourceList[i] = new RCB("R" + Integer.toString(i+1));
 		}
 	}
 	
@@ -29,6 +29,7 @@ public class Manager {
 		PCB pcb = new PCB("init", 0);
 		readyList[0].insert(pcb);
 		runningProcess = pcb;
+		System.out.println(runningProcess.getPID() + " is running.");
 	}
 	
 	public void create_process(String PID, int priority)
@@ -63,17 +64,43 @@ public class Manager {
 	
 	public void request_resource(String RID)
 	{
-		
+		for (int i = 0; i < resourceList.length; ++i) {
+			RCB rcb = resourceList[i];
+			if (rcb.getRID().equals(RID)) {
+				if (rcb.getStatus() == RCB.status.FREE) {
+					rcb.setStatus(RCB.status.ALLOCATED);
+					runningProcess.addResource(rcb);
+					rcb.setHolder(runningProcess);
+				} else {
+					runningProcess.setStatus(PCB.status.block);
+					rcb.addPCB(runningProcess);
+					readyList[runningProcess.getPriority()].removePCB(runningProcess);
+				}
+				break;
+			}
+		}
 	}
 	
 	public void release_resource(String RID)
 	{
-		
+		for (int i = 0; i < resourceList.length; ++i) {
+			RCB rcb = resourceList[i];
+			if (rcb.getRID().equals(RID)) {
+				rcb.setStatus(RCB.status.FREE);
+				rcb.getHolder().removeResource(rcb);
+				rcb.setHolder(null);
+				break;
+			}
+		}
 	}
 	
 	public void time_out()
 	{
-		
+		int priority = runningProcess.getPriority();
+		readyList[priority].removePCB(runningProcess);
+		readyList[priority].insert(runningProcess);
+		runningProcess.setStatus(PCB.status.ready);
+		scheduler();
 	}
 	
 	public void scheduler()
@@ -82,8 +109,8 @@ public class Manager {
 		for (int i = 2; i >= 0; --i) {
 			if(readyList[i].getSize() != 0) {
 				PCB p = readyList[i].highestPriorityPCB();
-				runningProcess.changeStatus(PCB.status.ready);
-				p.changeStatus(PCB.status.running);
+				runningProcess.setStatus(PCB.status.ready);
+				p.setStatus(PCB.status.running);
 				runningProcess = p;
 				break;
 			}
@@ -112,6 +139,26 @@ public class Manager {
 			readyList[i].removePCB(p);
 		}
 		
+	}
+	
+	public void memory_dump()
+	{
+		System.out.println("Current runing process: " + runningProcess.getPID());
+		for(int i = 2; i >= 0; i--)
+		{
+			if(readyList[i].getSize() == 0)
+				System.out.println("ReadyList w/ priority " + i + " is empty.");
+			else
+			{
+				System.out.println("ReadyList w/ priority " + i);
+				for(PCB b : readyList[i].getList())
+				{
+					System.out.println("PCB: " + b.getPID() + "\n");
+				}
+			}
+			
+			
+		}
 	}
 
 }

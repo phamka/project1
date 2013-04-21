@@ -24,4 +24,9 @@ public class ReadyList {
 	public PCB highestPriorityPCB() {
 		return list.get(0);
 	}
+	
+	public ArrayList<PCB> getList()
+	{
+		return list;
+	}
 }
