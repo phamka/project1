@@ -32,17 +32,22 @@
         provide information about a given resource
  */
 import java.io.*;
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class PresentationShell
 {
-	private static Manager manager;
-	
-    PresentationShell() {
-    	
-    }
+    private static Manager manager;
+    private static BufferedWriter out;
+    // test file on desktop
+    private static String outputFilename = "C:\\Users\\Khoa\\Desktop\\76218534.txt";
+    private static String inputFilename = "C:\\Users\\Khoa\\Desktop\\input.txt";
+    // test file on flash drive
+    //private static String inputFilename = "D:\\input.txt";
+    //private static String outputFilename = "D:\\76218534.txt";
 
+    PresentationShell() { }
+
+    // command opcode predefined
     public enum Command
     {
         INIT,   //INIT
@@ -50,44 +55,127 @@ public class PresentationShell
         CR,     //CREATE
         DE,     //DESTROY
         REQ,    //REQUEST
-        REL,
-        TO,      //TIMEOUT
-        DUMP
+        REL,    //RELEASE
+        TO,     //TIMEOUT
+        DUMP    //DUMP
     }
 
-    public static void main(String[] args)
-    {
-    	manager = new Manager();
-    	
-    	//read_file("");
-    	create_shell();
-       
+    public static void main(String[] args) throws IOException {
+        simulation();
+        //create_shell();
     }
-    
+
     // function to read in a file and execute line by line
-    public static void read_file(String filename)
+    public static void simulation()
     {
-    	BufferedReader br = null;
-    	
-    	try {
-    		String strLine;
-    		br = new BufferedReader(new FileReader(filename));
-    		
-    		// read line by line
-    		while ((strLine = br.readLine()) != null) {
-    			process_line(strLine);
-    		}
-    		
-    		br.close();
-    	} catch (Exception e) {
-    		System.err.println("ERROR: " + e.getMessage());
-    	}     	
+        try {
+            out = new BufferedWriter(new FileWriter(outputFilename));
+            manager = new Manager(out);
+
+            File file = new File(inputFilename);
+
+            Scanner scanner = new Scanner(file);
+
+            Command opcode;
+
+            while (scanner.hasNextLine()) {
+                String cmd = scanner.nextLine();
+                System.out.println(cmd);
+                if (cmd.equals(""))
+                {
+                    continue;
+                }
+                String[] cmds = cmd.split(" ");
+                opcode = Command.valueOf(cmds[0].toUpperCase());
+
+                switch (opcode) {
+
+                    case INIT: // init
+                        System.out.println("init");
+                        manager.create_init();
+                        break;
+
+                    case QUIT: // quit
+                        System.out.println("*exit system.");
+                        out.write("process terminated");
+                        break;
+
+                    case CR:    // cr A 1   //create <name> <priority>
+                        if(manager != null && cmds.length == 3)
+                        {
+                            String PID = cmds[1];
+                            int priorityNum = Integer.parseInt(cmds[2]);
+                            manager.create_process(PID, priorityNum);
+                        }
+                        else if(cmds.length != 3)
+                            System.out.println("error format");
+                        break;
+
+                    case DE: // de <name>
+                        if(manager != null && cmds.length == 2)
+                        {
+                            String PID = cmds[1];
+                            manager.destroy_process(PID);
+                            System.out.println("*destroy process");
+                        }
+                        else if(cmds.length != 2)
+                        {
+                            System.out.println("error format");
+                        }
+                        break;
+
+                    case REQ: // req <name>
+                        if(manager != null && cmds.length == 2)
+                        {
+                            String RID = cmds[1];
+                            manager.request_resource(RID);
+                            System.out.println("*request process");
+                        }
+                        else if(cmds.length != 2)
+                        {
+                            System.out.println("error format");
+                        }
+                        break;
+
+                    case REL: // rel <name>
+                        if(manager != null && cmds.length == 2)
+                        {
+                            String RID1 = cmds[1];
+                            manager.release_resource(RID1);
+                            System.out.println("*release process");
+                        }
+                        else if(cmds.length != 2)
+                        {
+                            System.out.println("error format");
+                        }
+
+                        break;
+
+                    case TO: // to
+                        manager.time_out();
+                        break;
+
+                    case DUMP: // dump
+                        manager.memory_dump();
+                        break;
+                }
+
+            }
+            scanner.close();
+
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
-    
+
     // creating shell for process command manually
-    public static void create_shell()
-    {
-    	Scanner consoleIn = new Scanner(System.in);
+    public static void create_shell() throws IOException {
+        out = new BufferedWriter(new FileWriter(outputFilename));
+        manager = new Manager(out);
+        Scanner consoleIn = new Scanner(System.in);
         Command opcode;
 
 
@@ -98,78 +186,68 @@ public class PresentationShell
             opcode = Command.valueOf(cmds[0].toUpperCase());
 
             switch (opcode) {
-                case INIT:
+                case INIT: // init
                     manager.create_init();
-                    //System.out.println("input is init");
                     break;
 
-                case QUIT:
+                case QUIT: // quit
                     if (cmds.length != 1)
                     {
                         System.out.println("\nError: 'quit' format is wrong type quit");
                     }
-                    System.out.println("*exit system");
+                    System.out.println("*exit system.");
+                    out.write("process terminated.");
                     break;
                 case CR:    // cr A 1   //create <name> <priority>
-                    //System.out.println("*create process");
 
                     if(manager != null && cmds.length == 3)
                     {
-                        String processName = cmds[1];
+                        String PID = cmds[1];
                         int priorityNum = Integer.parseInt(cmds[2]);
-                        manager.create_process(processName, priorityNum);
+                        manager.create_process(PID, priorityNum);
                     }
                     else if(cmds.length != 3)
                         System.out.println("error format");
                     break;
 
                 case DE: // de <name>
-                    
-                    
+
+
                     if(manager != null && cmds.length == 2)
                     {
-                    	String PID = cmds[1];
-                    	manager.destroy_process(PID);
-                    	System.out.println("*destroy process");
+                        String PID = cmds[1];
+                        manager.destroy_process(PID);
+                        System.out.println("*destroy process");
                     }
                     else if(cmds.length != 2)
                     {
-                    	System.out.println("error format");
+                        System.out.println("error format");
                     }
-                    
+
                     break;
 
-                case REQ:
-                    System.out.println("*request resource");
+                case REQ: // req <name>
                     String RID = cmds[1];
                     manager.request_resource(RID);
                     break;
-                    
-                case REL:
-                	String RID1 = cmds[1];
-                	manager.release_resource(RID1);
-                case TO:
-                    System.out.println("*process time-out");
+
+                case REL: // rel <name>
+                    String RID1 = cmds[1];
+                    manager.release_resource(RID1);
+                    break;
+
+                case TO: // to
                     manager.time_out();
                     break;
 
-                case DUMP:
-                	manager.memory_dump();
-                	break;
-                    
-                default:
-                    System.out.println("wrong command please enter correct input.");
+                case DUMP: // dump
+                    manager.memory_dump();
+                    break;
             }
 
         }while(!(opcode == Command.QUIT));
 
         consoleIn.close();
+        out.close();
     }
-    
-    public static void process_line(String line)
-    {
-    	
-    }
-    
-    
 }
